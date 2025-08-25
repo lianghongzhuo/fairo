@@ -5,9 +5,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(pinocchio_isolation)
 
-SET(CMAKE_CXX_FLAGS "-std=c++14 -O3")
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
-
 # Find spdlog (C++ logger)
 if(NOT TARGET spdlog)
     find_package(spdlog REQUIRED)
@@ -30,5 +27,6 @@ add_library(pinocchio_wrapper SHARED src/pinocchio_wrapper.cpp)
 set_target_properties(pinocchio_wrapper PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_link_libraries(pinocchio_wrapper
     ${pinocchio_LIBRARIES}
+    pinocchio::pinocchio_parsers
     spdlog::spdlog
 )

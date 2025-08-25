@@ -4,22 +4,30 @@
 # LICENSE file in the root directory of this source tree.
 cmake_minimum_required(VERSION 3.14)
 project(polymetis)
+set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "-std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-
-add_library(protobuf::libprotobuf UNKNOWN IMPORTED)
-set_target_properties(protobuf::libprotobuf PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "$ENV{CONDA_PREFIX}/include/google/protobuf/")
-set_target_properties(protobuf::libprotobuf PROPERTIES
-  IMPORTED_LOCATION "$ENV{CONDA_PREFIX}/lib/libprotobuf.so")
-set_property(TARGET protobuf::libprotobuf APPEND PROPERTY
-  INTERFACE_COMPILE_FEATURES cxx_std_11
-)
+#########################################################################
+# "satisfy" Caffe2 by faking some targets before find_package(Torch):####
+#########################################################################
+set(Protobuf_DIR "/root/micromamba/envs/robot/lib/cmake/protobuf")
+find_package(Protobuf REQUIRED)
+# Add dummy upb targets if they don't exist
+if(NOT TARGET protobuf::libupb)
+  add_library(protobuf::libupb INTERFACE IMPORTED)
+endif()
+if(NOT TARGET protobuf::protoc-gen-upb)
+  add_executable(protobuf::protoc-gen-upb IMPORTED)
+endif()
+if(NOT TARGET protobuf::protoc-gen-upbdefs)
+  add_executable(protobuf::protoc-gen-upbdefs IMPORTED)
+endif()
+#########################################################################
+# end of the hack #######################################################
+#########################################################################
 
 add_subdirectory("torch_isolation/")
 
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+# add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
 if(DEFINED ENV{PREFIX})
   message("Using $ENV{PREFIX} as output dir")

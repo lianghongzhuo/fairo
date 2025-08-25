@@ -7,8 +7,6 @@ project(torch_isolation)
 
 add_subdirectory("pinocchio_isolation/")
 
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
-
 # Find Torch
 execute_process (
     COMMAND bash -c "python -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())' | tr -d '\n'"
