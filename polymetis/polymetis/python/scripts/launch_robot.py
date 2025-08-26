@@ -14,6 +14,7 @@ import time
 import signal
 
 import hydra
+from omegaconf import DictConfig
 
 from polymetis.utils.grpc_utils import check_server_exists
 from polymetis.utils.data_dir import BUILD_DIR, which
@@ -21,9 +22,8 @@ from polymetis.utils.data_dir import BUILD_DIR, which
 
 log = logging.getLogger(__name__)
 
-
-@hydra.main(config_name="launch_robot")
-def main(cfg):
+@hydra.main(version_base=None, config_name="launch_robot")
+def main(cfg: DictConfig):
     log.info(f"Adding {BUILD_DIR} to $PATH")
     os.environ["PATH"] = BUILD_DIR + os.pathsep + os.environ["PATH"]
 
