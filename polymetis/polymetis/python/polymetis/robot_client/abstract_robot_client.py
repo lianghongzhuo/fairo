@@ -20,6 +20,13 @@ class AbstractRobotClient(ABC):
     """
 
     def __init__(self, metadata_cfg: omegaconf.DictConfig):
+        # If metadata_cfg doesn't have _target_, add it
+        if "_target_" not in metadata_cfg:
+            metadata_cfg = omegaconf.OmegaConf.merge(
+                {"_target_": "polymetis.robot_client.metadata.RobotClientMetadata"},
+                metadata_cfg,
+            )
+
         self.metadata: RobotClientMetadata = hydra.utils.instantiate(metadata_cfg)
         assert isinstance(self.metadata, RobotClientMetadata)
 

@@ -2,7 +2,7 @@
 
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import List
+from typing import List, Union, Dict, Any
 from dataclasses import dataclass
 import io
 
@@ -74,8 +74,12 @@ class RobotClientMetadata:
         default_Kx: List[float],
         default_Kxd: List[float],
         hz: int,
-        robot_model_cfg: RobotModelConfig,
+        robot_model_cfg: Union[RobotModelConfig, Dict[str, Any]],
     ):
+        # Convert dict to RobotModelConfig if necessary
+        if isinstance(robot_model_cfg, dict):
+            robot_model_cfg = RobotModelConfig(**robot_model_cfg)
+
         # Generate default controller and convert to TorchScript binary
         default_controller = DefaultController(Kq=default_Kq, Kqd=default_Kqd)
         buffer = io.BytesIO()
@@ -87,9 +91,15 @@ class RobotClientMetadata:
         robot_client_metadata = polymetis_pb2.RobotClientMetadata()
         robot_client_metadata.hz = hz
         robot_client_metadata.dof = robot_model_cfg.num_dofs
-        if "ee_link_name" in robot_model_cfg:
+        if (
+            hasattr(robot_model_cfg, "ee_link_name")
+            and robot_model_cfg.ee_link_name is not None
+        ):
             robot_client_metadata.ee_link_name = robot_model_cfg.ee_link_name
-        if "ee_link_idx" in robot_model_cfg:
+        if (
+            hasattr(robot_model_cfg, "ee_link_idx")
+            and robot_model_cfg.ee_link_idx is not None
+        ):
             robot_client_metadata.ee_link_idx = robot_model_cfg.ee_link_idx
 
         # Set gains as shared metadata

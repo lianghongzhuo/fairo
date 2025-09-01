@@ -1,18 +1,6 @@
-hz: 1000
-use_real_time: true
-exec: franka_panda_client
-
+# @package _global_
 robot_client:
   _target_: polymetis.robot_client.executable_robot_client.ExecutableRobotClient
-  use_real_time: ${use_real_time}
-  metadata_cfg:
-    _target_: polymetis.robot_client.metadata.RobotClientMetadata
-    default_Kq: [40, 30, 50, 25, 35, 25, 10]
-    default_Kqd: [4, 6, 5, 5, 3, 2, 1]
-    default_Kx: [750, 750, 750, 15, 15, 15]
-    default_Kxd: [37, 37, 37, 2, 2, 2]
-    hz: ${hz}
-    robot_model_cfg: ${robot_model}
   executable_cfg:
     robot_ip: "172.16.0.2"
     control_ip: ${ip}
@@ -22,8 +10,8 @@ robot_client:
     use_real_time: ${use_real_time}
     hz: ${hz}
     num_dofs: ${robot_model.num_dofs}
-    exec: ${exec}
-    robot_client_metadata_path: ???
+    exec: "franka_panda_client"
+    robot_client_metadata_path: "robot_client_metadata.json"
 
     limit_rate: true
     lpf_cutoff_frequency: 100
@@ -90,3 +78,11 @@ robot_client:
         cartesian_pos: 200.0
         joint_pos: 50.0
         joint_vel: 20.0
+  use_real_time: ${use_real_time}
+  metadata_cfg:
+    default_Kq: [40, 30, 50, 25, 35, 25, 10]
+    default_Kqd: [4, 6, 5, 5, 3, 2, 1]
+    default_Kx: [750, 750, 750, 15, 15, 15]
+    default_Kxd: [37, 37, 37, 2, 2, 2]
+    hz: ${hz}
+    robot_model_cfg: ${robot_model}
