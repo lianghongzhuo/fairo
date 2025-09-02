@@ -35,7 +35,13 @@ FrankaTorqueControlClient::FrankaTorqueControlClient(
   buffer << file.rdbuf();
   file.close();
   RobotClientMetadata metadata;
-  assert(metadata.ParseFromString(buffer.str()));
+
+  // Critical: Ensure metadata is properly parsed and validated before sending to server
+  // This ParseFromString call is essential for proper protobuf initialization
+  if (!metadata.ParseFromString(buffer.str())) {
+    spdlog::error("Failed to parse robot client metadata from file: {}", robot_client_metadata_path);
+    throw std::runtime_error("Failed to parse metadata file: " + robot_client_metadata_path);
+  }
 
   // Initialize robot client with metadata
   ClientContext context;
@@ -156,6 +162,7 @@ void FrankaTorqueControlClient::run() {
     while (is_robot_operational) {
       // Send lambda function
       try {
+        spdlog::info("Enter robot control loop...");
         robot_ptr_->control(control_callback, limit_rate_, lpf_cutoff_freq_);
       } catch (const std::exception &ex) {
         spdlog::error("Robot is unable to be controlled: {}", ex.what());

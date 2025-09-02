@@ -44,9 +44,9 @@ def main(cfg: DictConfig):
 
     if cfg.use_real_time:
         log.info(f"Acquiring sudo...")
-        subprocess.run(["sudo", "echo", '"Acquired sudo."'], check=True)
-
-        server_cmd = ["sudo", "-s", "env", '"PATH=$PATH"'] + server_cmd + ["-r"]
+        # subprocess.run(["sudo", "echo", '"Acquired sudo."'], check=True)
+        # since we are in docker, we don't need to use sudo command
+        # server_cmd = ["sudo", "-s", "env", '"PATH=$PATH"'] + server_cmd + ["-r"]
     server_output = subprocess.Popen(
         server_cmd, stdout=sys.stdout, stderr=sys.stderr, preexec_fn=os.setpgrp
     )

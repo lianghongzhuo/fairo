@@ -2,7 +2,7 @@
 robot_client:
   _target_: polymetis.robot_client.executable_robot_client.ExecutableRobotClient
   executable_cfg:
-    robot_ip: "172.16.0.2"
+    robot_ip: "192.168.0.88"
     control_ip: ${ip}
     control_port: ${port}
     readonly: false
