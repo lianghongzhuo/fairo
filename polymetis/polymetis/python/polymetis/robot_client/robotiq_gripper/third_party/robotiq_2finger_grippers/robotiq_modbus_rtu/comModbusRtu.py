@@ -49,8 +49,9 @@ Module comModbusRtu: defines a class which communicates with Robotiq Grippers us
 The module depends on pymodbus (http://code.google.com/p/pymodbus/) for the Modbus RTU client.
 """
 
-from pymodbus.client.sync import ModbusSerialClient
+from pymodbus.client import ModbusSerialClient
 from pymodbus.exceptions import ModbusIOException
+from pymodbus.framer import FramerType
 from math import ceil
 
 
@@ -61,12 +62,12 @@ class communication:
     def connectToDevice(self, device):
         """Connection to the client - the method takes the IP address (as a string, e.g. '192.168.1.11') as an argument."""
         self.client = ModbusSerialClient(
-            method="rtu",
             port=device,
             stopbits=1,
             bytesize=8,
             baudrate=115200,
             timeout=0.2,
+            framer=FramerType.RTU,
         )
         if not self.client.connect():
             print("Unable to connect to %s" % device)
@@ -92,7 +93,7 @@ class communication:
 
         # To do!: Implement try/except
         try:
-            self.client.write_registers(0x03E8, message, unit=0x0009)
+            self.client.write_registers(0x03E8, message, device_id=0x0009)
         except:
             print("Modbus write operation failure")
             return False
@@ -105,7 +106,8 @@ class communication:
         # To do!: Implement try/except
         # Get status from the device
         try:
-            response = self.client.read_holding_registers(0x07D0, numRegs, unit=0x0009)
+            response = self.client.read_holding_registers(0x07D0, count=numRegs, device_id=0x0009)
+            registers = response.registers
         except Exception as e:
             print(e)
             return None
@@ -117,14 +119,12 @@ class communication:
         # Newer versions of pymodbus returns a ModbusIOException instead
         elif type(response) is ModbusIOException:
             return None
-
         # Instantiate output as an empty list
         output = []
-
         # Fill the output with the bytes in the appropriate order
         for i in range(0, numRegs):
-            output.append((response.getRegister(i) & 0xFF00) >> 8)
-            output.append(response.getRegister(i) & 0x00FF)
+            output.append((registers[i] & 0xFF00) >> 8)
+            output.append(registers[i] & 0x00FF)
 
         # Output the result
         return output
