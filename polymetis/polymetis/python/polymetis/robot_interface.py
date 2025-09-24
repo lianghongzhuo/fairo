@@ -484,7 +484,7 @@ class RobotInterface(BaseRobotInterface):
         if time_to_go is None:
             time_to_go = time_to_go_adaptive
         elif time_to_go < time_to_go_adaptive:
-            log.warn(
+            log.warning(
                 "The specified 'time_to_go' might not be large enough to ensure accurate movement."
             )
 
